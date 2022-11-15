@@ -104,11 +104,17 @@ for restart in range(flags.n_restarts):
     preds = (logits > 0.).float()
     return ((preds - y).abs() < 1e-2).float().mean()
 
+  # def penalty(logits, y):
+  #   # IRM objective (squared gradient norm)
+  #   scale = torch.tensor(1.).cuda().requires_grad_()
+  #   loss = mean_nll(logits * scale, y)
+  #   grad = autograd.grad(loss, [scale], create_graph=True)[0]
+  #   return torch.sum(grad**2)
+
   def penalty(logits, y):
-    scale = torch.tensor(1.).cuda().requires_grad_()
-    loss = mean_nll(logits * scale, y)
-    grad = autograd.grad(loss, [scale], create_graph=True)[0]
-    return torch.sum(grad**2)
+    # ERM objective
+    preds = (logits > 0.).float()
+    return ((preds-y)**2).float().mean()
 
   # Train loop
 
